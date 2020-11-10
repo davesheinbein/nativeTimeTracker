@@ -33,6 +33,14 @@ const App = () => {
 			amount: 3500,
 		},
 		{
+			date: moment().subtract(5, 'days').format('LL'),
+			amount: 3500,
+		},
+		{
+			date: moment().subtract(4, 'days').format('LL'),
+			amount: 3500,
+		},
+		{
 			date: moment().subtract(3, 'days').format('LL'),
 			amount: 5500,
 		},
@@ -58,24 +66,30 @@ const App = () => {
 
 	const getDates = () =>
 		tranformedData.map((pair) => pair.date);
+
 	const getAmounts = () =>
 		tranformedData.map((pair) => pair.amount);
 
 	const transformData = (groupedData) => {
 		const transformedArray = [];
+
 		Object.entries(groupedData).forEach((entry) => {
-			// sums ups each day entries
 			const total = entry[1].reduce(
 				(total, pair) => total + pair.amount,
 				0
-			);
+			); // sums ups each day entries
 			transformedArray.push({
-				date: entry[0],
+				date: moment(entry[0]).format('MMM DD'),
 				amount: total,
 			});
 		});
-		return transformedArray;
+		const sortedArray = transformedArray.sort((a, b) =>
+			moment(a['date']).diff(moment(b['date']))
+		);
 		console.log(transformedArray, '<< transformedArray');
+		console.log(sortedArray, '<< sortedArray');
+
+		return sortedArray;
 	};
 
 	// console.log(data, '<< data');
@@ -86,10 +100,10 @@ const App = () => {
 	// 	Object.entries(data, 'date'),
 	// 	'<< Object.entries(data)'
 	// );
-	console.log(
-		transformData(groupBy(data, 'date')),
-		'<<< transformData(groupBy(data, date)'
-	);
+	// console.log(
+	// 	transformData(groupBy(data, 'date')),
+	// 	'<<< transformData(groupBy(data, date)'
+	// );
 
 	const addGig = () => {
 		setGigs([
@@ -101,6 +115,14 @@ const App = () => {
 			},
 		]);
 
+		setData([
+			...data,
+			{
+				date: moment().format('LL'),
+				amount: Number(amount),
+			},
+		]);
+
 		setDescription('');
 		setAmount('');
 	};
@@ -109,9 +131,6 @@ const App = () => {
 		setTransformedData(
 			transformData(groupBy(data, 'date'))
 		);
-		return () => {
-			console.log('<< Hitting use effect');
-		};
 	}, [data]);
 
 	useEffect(() => {
